@@ -14,7 +14,7 @@ instead I used RIOT League of Legends API to fetch players, I made some changes 
 ## Table of Contents
 
 * [Features](#features)
-* [Features](#soon)
+* [Soon](#soon)
 * [Setup](#setup)
 * [Built With](#built-with)
 * [License](#license)
