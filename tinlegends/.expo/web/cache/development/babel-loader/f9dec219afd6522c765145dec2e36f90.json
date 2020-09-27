@@ -1,0 +1,1 @@
+{"ast":null,"code":"import Toast from \"./src\";\nexport default Toast;","map":{"version":3,"sources":["C:/Users/hades/myapp/tindev/tinlegends/node_modules/react-native-toast-message/index.js"],"names":["Toast"],"mappings":"AAAA,OAAOA,KAAP;AAEA,eAAeA,KAAf","sourcesContent":["import Toast from './src';\n\nexport default Toast;\n"]},"metadata":{},"sourceType":"module"}

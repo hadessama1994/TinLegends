@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import like from '../images/like.png'
 import dislike from '../images/dislike.png'
 import api from '../services/api'
-import { useScreens } from 'react-native-screens';
+import Toast from 'react-native-toast-message'
 
 // import { Container } from './styles';
 
@@ -13,41 +13,76 @@ const HomePage = ({route}) => {
    const {user} = route.params;
    const [players, setPlayers] = useState([]);
 
-   useEffect(()=>{
-      async function loadPlayers(){
-         const response = await api.get('/players', {
-            headers:{
-               user
-            }
-         })
-         setPlayers(response.data);
-      }
+   async function handleLike(id){
+      Toast.show({
+         text1: 'VOCÊ CURTIU ESSA PESSOA',         
+         visibilityTime: 2000,
+         autoHide: true,  
+       })
+      await api.post(`/players/${id}/likes`, null, {
+         headers: {user}
+      }) 
+      loadPlayers();       
+   }
+
+   async function handleDislike(id){
+      Toast.show({
+         type: 'error',
+         text1: 'VOCÊ RECUSOU ESSA PESSOA',         
+         visibilityTime: 2000,
+         autoHide: true,  
+       })
+      await api.post(`/players/${id}/dislikes`, null, {
+         headers: {user}
+      }) 
+      loadPlayers();       
+   }
+
+   async function loadPlayers(){
+      const response = await api.get('/players', {
+         headers:{
+            user
+         }
+      })
+      setPlayers(response.data);
+   }
+
+   useEffect(()=>{      
      loadPlayers(); 
    },[user])
    
   return (
    <>
+   
    <SafeAreaView style={styles.container}>
-      <View style={styles.cardsContainer}>
-         {players.map((user, index) =>(
+   <Toast ref={(ref) => Toast.setRef(ref)} />  
+      
+   {players.length == 0 ? <Text style={{fontSize: 25}}>No mores players to see.</Text> : (players.map((user, index) =>(   
+      <> 
+      <View style={styles.cardsContainer}> 
          <View key={user._id} style = {[styles.card, {zIndex: players.length - index}]} >
             <Image style={styles.img} source= {{uri: user.avatar}}/>
             <View style={styles.nameContainer}>
-         <Text style={styles.name}>{user.name}</Text>
+               <Text style={styles.name}>{user.name}</Text>
                <Text style={styles.level}>Level: {user.level}</Text>
             </View>
             <Image style={styles.elo} source= {{uri: user.rankingElo}}/>
-         </View>)
-         )}
+            </View>            
       </View>
       <View style={styles.buttonsContainer}>
-         <TouchableOpacity style={styles.button}>
-            <Image source={like}></Image>            
-         </TouchableOpacity>
-         <TouchableOpacity style={styles.button}>
-            <Image source={dislike}></Image>            
-         </TouchableOpacity>
-      </View>
+            <TouchableOpacity onPress={()=>{handleLike(user._id)}} style={styles.button}>
+               <Image source={like}></Image>            
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{handleDislike(user._id)}} style={styles.button}>
+               <Image source={dislike}></Image>            
+            </TouchableOpacity>
+         </View>
+       </> 
+      )))}
+      
+            
+      
+     
    </SafeAreaView>
    </>
   )
@@ -58,14 +93,16 @@ const styles = StyleSheet.create({
       backgroundColor: "#f3f3f3",
       flex: 1,
       alignItems: "center",
-      justifyContent: "center",      
+      justifyContent: "center",
+           
    },
    img:{
-      flex: 1,     
-      width: 380,      
-      alignItems: 'center',
+      width: 380,
+      height: 360,
+      
    },
    elo:{
+      marginTop: 10,
       width: 80,
       height: 80,      
       alignItems: 'center',
@@ -75,32 +112,32 @@ const styles = StyleSheet.create({
       flex: 1,
       alignSelf: 'stretch',
       justifyContent: 'center',
-      maxHeight: 600,
-      
+      maxHeight: 600,   
+      position: 'absolute',      
+      left:0,
+      right:0,       
       
    },
    card: {
       borderWidth:1,
       borderColor: "#DDD",
-      borderRadius: 8,
+      borderRadius: 8,      
       margin: 30,
       overflow: 'hidden',
-      alignItems: "center",
-      position: 'absolute',
+      alignItems: "center",     
       backgroundColor: "#fff",
-      top:0,
-      left:0,
-      right:0,
-      bottom:0      
+          
    },
    nameContainer: {
+      position: 'absolute',
       backgroundColor: "#343A40",
       borderWidth:1,
       borderRadius: 5,
-      marginTop: 10,
+      flexDirection:'column',
       paddingLeft: 20,
       paddingRight: 20,
       marginBottom: 15,
+      alignItems: 'flex-end'
    },
    name: {
       fontSize: 22,
@@ -115,8 +152,10 @@ const styles = StyleSheet.create({
       fontWeight: "500",
    },
    buttonsContainer:{
-      flexDirection: "row",
-      marginBottom: 30,      
+      flexDirection: "row",      
+      overflow: 'hidden',
+      position: 'absolute', 
+      
    },
    button:{
       width: 50,
@@ -124,8 +163,8 @@ const styles = StyleSheet.create({
       borderRadius: 25,
       backgroundColor: "#FFF",
       justifyContent: 'center',
-      alignItems: "center",
-      marginHorizontal: 20,
+      alignItems: "center",      
+      marginHorizontal: 120,
       elevation: 2,
       shadowColor: '#000',
       shadowOpacity: 0.05,
@@ -133,7 +172,8 @@ const styles = StyleSheet.create({
       shadowOffset:{
          width:0,
          height: 2,
-      }
+      },
+      marginTop: 200
    }
 })
 

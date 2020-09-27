@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Text, ActivityIndicator, StyleSheet, Image, TextInput, TouchableOpacity, Platform } from 'react-native';
 import api from '../services/api'
 
@@ -24,9 +24,11 @@ const HomeLogin = ({ navigation }) => {
       const {_id} = response.data;
       
       navigation.navigate('TinLegends', {user: _id}); 
+      setLoading(false);
    } catch (error) {
-      setLoading(false)
+      setLoading(false);
    }
+   
      
         
    }
